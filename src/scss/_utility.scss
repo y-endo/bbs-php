@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+.u-dn-pc {
+  @include pc {
+    display: none !important;
+  }
+}
+
+.u-dn-sp {
+  @include sp {
+    display: none !important;
+  }
+}

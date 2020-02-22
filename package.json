@@ -1,0 +1,27 @@
+{
+  "name": "bbs-php",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "stylelint": "stylelint --fix ./src/scss/*",
+    "dev": "onchange './src/scss/**/*.scss' -- npm run stylelint & gulp",
+    "build": "gulp scss"
+  },
+  "repository": "https://github.com/y-endo/bbs-php.git",
+  "author": "YukiEndo",
+  "license": "MIT",
+  "devDependencies": {
+    "css-mqpacker": "^7.0.0",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.0.2",
+    "onchange": "^6.1.0",
+    "prettier": "^1.19.1",
+    "stylelint": "^13.2.0",
+    "stylelint-config-rational-order": "^0.1.2",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-order": "^4.0.0",
+    "stylelint-scss": "^3.14.2"
+  }
+}
