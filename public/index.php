@@ -19,37 +19,77 @@
   $data = null;
   $file_handle = null;
   $message_array = array();
+  $success_message = null;
+  $error_message = array();
 
-  if (!empty($_POST['name']) && !empty($_POST['message'])) {
-    if ($file_handle = fopen(FILENAME, 'a')) {
-      // 書き込み日時を取得
-      $now = date('Y-m-d H:i:s');
-      // 書き込むデータを作成
-      $data = "{$_POST['name']}***{$_POST['message']}***{$now}\n";
-      // 書き込み
-      fwrite($file_handle, $data);
-      // ファイルを閉じる
-      fclose($file_handle);
+  if (!empty($_POST['submit'])) {
+    $name = $_POST['name'];
+    if (empty($name)) {
+      $error_message[] = '名前を入力してください。';
+    } else {
+      $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+      $name = preg_replace('/\\r\\n|\\n|\\r/', '', $name);
+    }
+
+    $message = $_POST['message'];
+    if (empty($message)) {
+      $error_message[] = 'メッセージを入力してください。';
+    } else {
+      $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+      $message = preg_replace('/\\r\\n|\\n|\\r/', '<br>', $message);
+    }
+
+    // PDOでmysqlに接続
+    try {
+      $pdo = new PDO('mysql:host=bbs-php-mysql;dbname=bbs-php;charset=utf8;', 'bbs-php', 'bbs-php');
+    } catch (PDOException $error) {
+      $error_message[] = $error->getMessage();
+    }
+
+    // MySQLにデータの書き込み
+    if (empty($error_message)) {
+      $stmt = $pdo->prepare('INSERT INTO message (name, message, post_date) VALUES (:name, :message, :post_date)');
+      $stmt->bindValue(':name', $name);
+      $stmt->bindValue(':message', $message);
+      $stmt->bindValue(':post_date', date('Y-m-d H:i:s'));
+
+      if ($stmt->execute()) {
+        $success_message = 'メッセージを書き込みました。';
+      } else {
+        $error_message = $stmt->errorInfo();
+      }
     }
   }
 
-  if ($file_handle = fopen(FILENAME, 'r')) {
-    while($data = fgets($file_handle)) {
-      $split_data = preg_split('/\*\*\*/', $data);
-      $message = array(
-        'name' => $split_data[0],
-        'message' => $split_data[1],
-        'post_date' => $split_data[2]
-      );
-      array_unshift($message_array, $message);
-    }
+  // PDOでmysqlに接続
+  try {
+    $pdo = new PDO('mysql:host=bbs-php-mysql;dbname=bbs-php;charset=utf8;', 'bbs-php', 'bbs-php');
+  } catch (PDOException $error) {
+    $error_message[] = $error->getMessage();
+  }
 
-    // ファイルを閉じる
-    fclose($file_handle);
+  // MySQLからデータを取得
+  if (empty($error_message)) {
+    $message_array = $pdo->query('SELECT name, message, post_date FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
   }
 ?>
 <section class="section">
   <div class="container">
+    <h1 class="title">掲示板</h1>
+    <?php if (!empty($success_message)): ?>
+    <div class="notification is-success">
+      <button class="delete"></button>
+      <?= $success_message ?>
+    </div>
+    <?php endif; ?>
+    <?php if (!empty($error_message)): ?>
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      <?php foreach($error_message as $value): ?>
+      <?= $value ?><br>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
     <form method="post">
       <div class="field">
         <label class="label">名前</label>
@@ -65,27 +105,29 @@
       </div>
       <div class="field">
         <div class="control">
-          <button class="button is-link">書き込む</button>
+          <button class="button is-link" name="submit" value="write">書き込む</button>
         </div>
       </div>
     </form>
     <div class="is-divider"></div>
     <?php if (!empty($message_array)): ?>
     <?php foreach($message_array as $value): ?>
-    <article class="media">
-      <div class="media-content">
-        <div class="content">
-          <p>
-            <strong><?= $value['name'] ?></strong> <small><?= date('Y年m月d日 H:i', strtotime($value['post_date'])) ?></small>
-            <br>
-            <?= $value['message'] ?>
-          </p>
+    <div class="box">
+      <article class="media">
+        <div class="media-content">
+          <div class="content">
+            <p>
+              <strong><?= $value['name'] ?></strong> <small><?= date('Y年m月d日 H:i', strtotime($value['post_date'])) ?></small>
+              <br>
+              <?= $value['message'] ?>
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="media-right">
-        <button class="delete"></button>
-      </div>
-    </article>
+        <div class="media-right">
+          <button class="delete"></button>
+        </div>
+      </article>
+    </div>
     <?php endforeach; ?>
     <?php endif; ?>
   </div>

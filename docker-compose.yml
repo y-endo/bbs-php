@@ -1,31 +1,35 @@
-version: '3'
+version: "3"
 services:
   php:
-    image: php:7.2-apache
+    build:
+      context: "./docker/php"
+    container_name: "bbs-php-php"
     volumes:
-      - ./php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
       - ./public/:/var/www/html
     ports:
       - 8080:80
   mysql:
     image: mysql:5.7
+    container_name: "bbs-php-mysql"
     volumes:
-      - ./mysql:/var/lib/mysql
+      - ./docker/mysql:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=test
-      - MYSQL_USER=test
-      - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=bbs-php
+      - MYSQL_USER=bbs-php
+      - MYSQL_PASSWORD=bbs-php
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: "bbs-php-phpmyadmin"
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=mysql
-      - PMA_USER=test
-      - PMA_PASSWORD=test
+      - PMA_USER=bbs-php
+      - PMA_PASSWORD=bbs-php
     links:
       - mysql
     ports:
       - 4040:80
     volumes:
-      - ./phpmyadmin/sessions:/sessions
+      - ./docker/phpmyadmin/sessions:/sessions
