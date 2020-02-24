@@ -9,15 +9,14 @@
 </head>
 <body>
 <?php
-  // メッセージを保存するファイルのパス
-  const FILENAME = './message.txt';
-
   // タイムゾーンの設定
   date_default_timezone_set('Asia/Tokyo');
 
-  $now = null;
-  $data = null;
-  $file_handle = null;
+  const DB_HOST = 'bbs-php-mysql';
+  const DB_USER = 'bbs-php';
+  const DB_PASS = 'bbs-php';
+  const DB_NAME = 'bbs-php';
+
   $message_array = array();
   $success_message = null;
   $error_message = array();
@@ -41,7 +40,8 @@
 
     // PDOでmysqlに接続
     try {
-      $pdo = new PDO('mysql:host=bbs-php-mysql;dbname=bbs-php;charset=utf8;', 'bbs-php', 'bbs-php');
+      $i = function ($v) { return $v; };
+      $pdo = new PDO("mysql:host={$i(DB_HOST)};dbname={$i(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
     } catch (PDOException $error) {
       $error_message[] = $error->getMessage();
     }
@@ -63,7 +63,8 @@
 
   // PDOでmysqlに接続
   try {
-    $pdo = new PDO('mysql:host=bbs-php-mysql;dbname=bbs-php;charset=utf8;', 'bbs-php', 'bbs-php');
+    $i = function ($v) { return $v; };
+    $pdo = new PDO("mysql:host={$i(DB_HOST)};dbname={$i(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
   } catch (PDOException $error) {
     $error_message[] = $error->getMessage();
   }
