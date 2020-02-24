@@ -28,7 +28,6 @@
       $error_message[] = '名前を入力してください。';
     } else {
       $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-      $name = preg_replace('/\\r\\n|\\n|\\r/', '', $name);
 
       // セッションに名前を保存
       $_SESSION['name'] = $name;
@@ -39,7 +38,6 @@
       $error_message[] = 'メッセージを入力してください。';
     } else {
       $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
-      $message = preg_replace('/\\r\\n|\\n|\\r/', '<br>', $message);
     }
 
     // PDOでmysqlに接続
@@ -124,7 +122,7 @@
             <p>
               <strong><?= $value['name'] ?></strong> <small><?= date('Y年m月d日 H:i', strtotime($value['post_date'])) ?></small>
               <br>
-              <?= $value['message'] ?>
+              <?= nl2br($value['message']) ?>
             </p>
           </div>
         </div>
