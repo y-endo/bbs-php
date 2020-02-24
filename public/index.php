@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +29,9 @@
     } else {
       $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
       $name = preg_replace('/\\r\\n|\\n|\\r/', '', $name);
+
+      // セッションに名前を保存
+      $_SESSION['name'] = $name;
     }
 
     $message = $_POST['message'];
@@ -95,7 +99,7 @@
       <div class="field">
         <label class="label">名前</label>
         <div class="control">
-          <input class="input" type="text" placeholder="名前" name="name">
+          <input class="input" type="text" placeholder="名前" name="name" value="<?php if (!empty($_SESSION['name'])) { echo $_SESSION['name']; } ?>">
         </div>
       </div>
       <div class="field">
@@ -123,9 +127,6 @@
               <?= $value['message'] ?>
             </p>
           </div>
-        </div>
-        <div class="media-right">
-          <button class="delete"></button>
         </div>
       </article>
     </div>
