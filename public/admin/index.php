@@ -100,7 +100,7 @@
           <nav class="level">
             <div class="level-left">
               <a href="./edit.php?id=<?= $value['id'] ?>" class="level-item">編集</a>
-              <a class="level-item">削除</a>
+              <a href="./delete.php?id=<?= $value['id'] ?>" class="level-item">削除</a>
             </div>
           </nav>
         </div>

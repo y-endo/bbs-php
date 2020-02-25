@@ -14,7 +14,7 @@ session_start();
 
 // 取得件数
 if (!empty($_GET['limit'])) {
-  $limit = intval($_GET['limit']);
+  $limit = (int)($_GET['limit']);
 }
 
 if (!empty($_SESSION['admin_login']) && $_SESSION['admin_login'] === true) {
