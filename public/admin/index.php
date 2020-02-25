@@ -1,14 +1,3 @@
-<?php session_start(); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-divider/dist/css/bulma-divider.min.css">
-<title>管理ページ | 掲示板</title>
-</head>
-<body>
 <?php
   // タイムゾーンの設定
   date_default_timezone_set('Asia/Tokyo');
@@ -19,6 +8,8 @@
   const DB_NAME = 'bbs-php';
 
   const ADMIN_PASS = 'password';
+
+  session_start();
 
   $message_array = array();
   $error_message = array();
@@ -49,6 +40,16 @@
     $message_array = $pdo->query('SELECT * FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
   }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-divider/dist/css/bulma-divider.min.css">
+<title>管理ページ | 掲示板</title>
+</head>
+<body>
 <section class="section">
   <div class="container">
     <h1 class="title">管理ページ | 掲示板</h1>

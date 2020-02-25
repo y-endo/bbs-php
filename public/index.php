@@ -1,14 +1,3 @@
-<?php session_start(); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-divider/dist/css/bulma-divider.min.css">
-<title>掲示板</title>
-</head>
-<body>
 <?php
   // タイムゾーンの設定
   date_default_timezone_set('Asia/Tokyo');
@@ -18,8 +7,9 @@
   const DB_PASS = 'bbs-php';
   const DB_NAME = 'bbs-php';
 
+  session_start();
+
   $message_array = array();
-  $success_message = null;
   $error_message = array();
 
   if (!empty($_POST['submit'])) {
@@ -56,7 +46,9 @@
       $stmt->bindValue(':post_date', date('Y-m-d H:i:s'));
 
       if ($stmt->execute()) {
-        $success_message = 'メッセージを書き込みました。';
+        $_SESSION['success_message'] = 'メッセージを書き込みました。';
+
+        header('Location: ./');
       } else {
         $error_message = $stmt->errorInfo();
       }
@@ -76,13 +68,24 @@
     $message_array = $pdo->query('SELECT name, message, post_date FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
   }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-divider/dist/css/bulma-divider.min.css">
+<title>掲示板</title>
+</head>
+<body>
 <section class="section">
   <div class="container">
     <h1 class="title">掲示板</h1>
-    <?php if (!empty($success_message)): ?>
+    <?php if (empty($_POST['submit']) && !empty($_SESSION['success_message'])): ?>
     <div class="notification is-success">
       <button class="delete"></button>
-      <?= $success_message ?>
+      <?= $_SESSION['success_message']; ?>
+      <?php unset($_SESSION['success_message']); ?>
     </div>
     <?php endif; ?>
     <?php if (!empty($error_message)): ?>
