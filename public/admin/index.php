@@ -23,6 +23,11 @@
   $message_array = array();
   $error_message = array();
 
+  // ログアウト（セッション削除）
+  if (!empty($_GET['logout'])) {
+    unset($_SESSION['admin_login']);
+  }
+
   if (!empty($_POST['submit'])) {
     if (!empty($_POST['pass']) && $_POST['pass'] === ADMIN_PASS) {
       $_SESSION['admin_login'] = true;
@@ -59,31 +64,40 @@
     <?php if (!empty($message_array)): ?>
     <div class="content">
       <form method="get" action="./download.php">
-      <nav class="level">
-        <div class="level-left">
-          <div class="level-item">
-            <div class="field">
-              <div class="control">
-                <div class="select">
-                  <select name="limit">
-                    <option value="" selected>全て</option>
-                    <option value="10">10件</option>
-                    <option value="30">30件</option>
-                    <option value="50">50件</option>
-                  </select>
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <div class="level-item">
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <select name="limit">
+                      <option value="" selected>全て</option>
+                      <option value="10">10件</option>
+                      <option value="30">30件</option>
+                      <option value="50">50件</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="level-item">
+              <div class="field">
+                <div class="control">
+                  <button class="button is-link" name="download" value="true">ダウンロード</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="level-item">
-            <div class="field">
-              <div class="control">
-                <button class="button is-link" name="download" value="true">ダウンロード</button>
-              </div>
-            </div>
+        </nav>
+      </form>
+    </div>
+    <div class="content">
+      <form method="get">
+        <div class="field">
+          <div class="control">
+            <button class="button is-dark" name="logout" value="logout">ログアウト</button>
           </div>
         </div>
-      </nav>
       </form>
     </div>
     <?php foreach($message_array as $value): ?>
@@ -97,7 +111,7 @@
               <?= nl2br($value['message']) ?>
             </p>
           </div>
-          <nav class="level">
+          <nav class="level is-mobile">
             <div class="level-left">
               <a href="./edit.php?id=<?= $value['id'] ?>" class="level-item">編集</a>
               <a href="./delete.php?id=<?= $value['id'] ?>" class="level-item">削除</a>
