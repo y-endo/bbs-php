@@ -1,4 +1,7 @@
 <?php
+  require_once './common.php';
+  session_start();
+
   // タイムゾーンの設定
   date_default_timezone_set('Asia/Tokyo');
 
@@ -7,65 +10,61 @@
   const DB_PASS = 'bbs-php';
   const DB_NAME = 'bbs-php';
 
-  session_start();
-
   $message_array = array();
   $error_message = array();
 
   if (!empty($_POST['submit'])) {
-    $name = $_POST['name'];
-    if (empty($name)) {
-      $error_message[] = '名前を入力してください。';
-    } else {
-      $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-
-      // セッションに名前を保存
-      $_SESSION['name'] = $name;
-    }
-
-    $message = $_POST['message'];
-    if (empty($message)) {
-      $error_message[] = 'メッセージを入力してください。';
-    } else {
-      $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
-    }
-
-    // PDOでmysqlに接続
-    try {
-      $i = function ($v) { return $v; };
-      $pdo = new PDO("mysql:host={$i(DB_HOST)};dbname={$i(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
-    } catch (PDOException $error) {
-      $error_message[] = $error->getMessage();
-    }
-
-    // MySQLにデータの書き込み
-    if (empty($error_message)) {
-      $stmt = $pdo->prepare('INSERT INTO message (name, message, post_date) VALUES (:name, :message, :post_date)');
-      $stmt->bindValue(':name', $name);
-      $stmt->bindValue(':message', $message);
-      $stmt->bindValue(':post_date', date('Y-m-d H:i:s'));
-
-      if ($stmt->execute()) {
-        $_SESSION['success_message'] = 'メッセージを書き込みました。';
-
-        header('Location: ./');
+      $name = $_POST['name'];
+      if (empty($name)) {
+          $error_message[] = '名前を入力してください。';
       } else {
-        $error_message = $stmt->errorInfo();
+          $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+          // セッションに名前を保存
+          $_SESSION['name'] = $name;
       }
-    }
+
+      $message = $_POST['message'];
+      if (empty($message)) {
+          $error_message[] = 'メッセージを入力してください。';
+      } else {
+          $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+      }
+
+      // PDOでmysqlに接続
+      try {
+          $pdo = new PDO("mysql:host={$identity(DB_HOST)};dbname={$identity(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
+      } catch (PDOException $error) {
+          $error_message[] = $error->getMessage();
+      }
+
+      // MySQLにデータの書き込み
+      if (empty($error_message)) {
+          $stmt = $pdo->prepare('INSERT INTO message (name, message, post_date) VALUES (:name, :message, :post_date)');
+          $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+          $stmt->bindValue(':message', $message, PDO::PARAM_STR);
+          $stmt->bindValue(':post_date', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+          if ($stmt->execute()) {
+              $_SESSION['success_message'] = 'メッセージを書き込みました。';
+
+              header('Location: ./');
+          } else {
+              $error_message = $stmt->errorInfo();
+          }
+      }
   }
 
   // PDOでmysqlに接続
   try {
-    $i = function ($v) { return $v; };
-    $pdo = new PDO("mysql:host={$i(DB_HOST)};dbname={$i(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
+      $pdo = new PDO("mysql:host={$identity(DB_HOST)};dbname={$identity(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
   } catch (PDOException $error) {
-    $error_message[] = $error->getMessage();
+      $error_message[] = $error->getMessage();
   }
 
   // MySQLからデータを取得
   if (empty($error_message)) {
-    $message_array = $pdo->query('SELECT name, message, post_date FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
+      $message_array = $pdo->query('SELECT name, message, post_date FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
   }
 ?>
 <!DOCTYPE html>
@@ -91,7 +90,7 @@
     <?php if (!empty($error_message)): ?>
     <div class="notification is-danger">
       <button class="delete"></button>
-      <?php foreach($error_message as $value): ?>
+      <?php foreach ($error_message as $value): ?>
       <?= $value ?><br>
       <?php endforeach; ?>
     </div>
@@ -100,7 +99,9 @@
       <div class="field">
         <label class="label">名前</label>
         <div class="control">
-          <input class="input" type="text" placeholder="名前" name="name" value="<?php if (!empty($_SESSION['name'])) { echo $_SESSION['name']; } ?>">
+          <input class="input" type="text" placeholder="名前" name="name" value="<?php if (!empty($_SESSION['name'])) {
+    echo $_SESSION['name'];
+} ?>">
         </div>
       </div>
       <div class="field">
@@ -117,7 +118,7 @@
     </form>
     <div class="is-divider"></div>
     <?php if (!empty($message_array)): ?>
-    <?php foreach($message_array as $value): ?>
+    <?php foreach ($message_array as $value): ?>
     <div class="box">
       <article class="media">
         <div class="media-content">

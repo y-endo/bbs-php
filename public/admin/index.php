@@ -1,4 +1,8 @@
 <?php
+  require_once '../common.php';
+
+  session_start();
+
   // タイムゾーンの設定
   date_default_timezone_set('Asia/Tokyo');
 
@@ -9,35 +13,32 @@
 
   const ADMIN_PASS = 'password';
 
-  session_start();
-
   $message_array = array();
   $error_message = array();
 
   // ログアウト（セッション削除）
   if (!empty($_GET['logout'])) {
-    unset($_SESSION['admin_login']);
+      unset($_SESSION['admin_login']);
   }
 
   if (!empty($_POST['submit'])) {
-    if (!empty($_POST['pass']) && $_POST['pass'] === ADMIN_PASS) {
-      $_SESSION['admin_login'] = true;
-    } else {
-      $error_message[] = 'ログインに失敗しました。';
-    }
+      if (!empty($_POST['pass']) && $_POST['pass'] === ADMIN_PASS) {
+          $_SESSION['admin_login'] = true;
+      } else {
+          $error_message[] = 'ログインに失敗しました。';
+      }
   }
 
   // PDOでmysqlに接続
   try {
-    $i = function ($v) { return $v; };
-    $pdo = new PDO("mysql:host={$i(DB_HOST)};dbname={$i(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
+      $pdo = new PDO("mysql:host={$identity(DB_HOST)};dbname={$identity(DB_NAME)};charset=utf8;", DB_USER, DB_PASS);
   } catch (PDOException $error) {
-    $error_message[] = $error->getMessage();
+      $error_message[] = $error->getMessage();
   }
 
   // MySQLからデータを取得
   if (empty($error_message)) {
-    $message_array = $pdo->query('SELECT * FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
+      $message_array = $pdo->query('SELECT * FROM message ORDER BY post_date DESC')->fetchAll(PDO::FETCH_ASSOC);
   }
 ?>
 <!DOCTYPE html>
@@ -56,7 +57,7 @@
     <?php if (!empty($error_message)): ?>
     <div class="notification is-danger">
       <button class="delete"></button>
-      <?php foreach($error_message as $value): ?>
+      <?php foreach ($error_message as $value): ?>
       <?= $value ?><br>
       <?php endforeach; ?>
     </div>
@@ -101,7 +102,7 @@
         </div>
       </form>
     </div>
-    <?php foreach($message_array as $value): ?>
+    <?php foreach ($message_array as $value): ?>
     <div class="box">
       <article class="media">
         <div class="media-content">
